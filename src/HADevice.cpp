@@ -58,6 +58,21 @@ bool HADevice::setUniqueId(const byte* uniqueId, const uint16_t length)
     return true;
 }
 
+bool HADevice::setUniqueIdStr(char* pstr)
+{
+    if (_uniqueId) {
+        return false; // unique ID cannot be changed at runtime once it's set
+    }
+
+
+    char* dst = strdup(pstr); // include null terminator
+
+    _uniqueId = dst;
+    _ownsUniqueId = true;
+    _serializer->set(AHATOFSTR(HADeviceIdentifiersProperty), _uniqueId);
+    return true;
+}
+
 void HADevice::setManufacturer(const char* manufacturer)
 {
     _serializer->set(AHATOFSTR(HADeviceManufacturerProperty), manufacturer);
@@ -138,6 +153,7 @@ void HADevice::publishAvailability() const
 
     const char* payload = _available ? HAOnline : HAOffline;
     const uint16_t length = strlen_P(payload);
+
 
     if (mqtt->beginPublish(_availabilityTopic, length, true)) {
         mqtt->writePayload(AHATOFSTR(payload));

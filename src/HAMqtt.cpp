@@ -19,6 +19,7 @@
     _password(nullptr), \
     _lastConnectionAttemptAt(0), \
     _devicesTypesNb(0), \
+    _devicesTypesNb_toreg(0), \
     _maxDevicesTypesNb(maxDevicesTypesNb), \
     _devicesTypes(new HABaseDeviceType*[maxDevicesTypesNb]), \
     _lastWillTopic(nullptr), \
@@ -185,7 +186,10 @@ bool HAMqtt::isConnected() const
 
 void HAMqtt::addDeviceType(HABaseDeviceType* deviceType)
 {
-    if (_devicesTypesNb + 1 >= _maxDevicesTypesNb) {
+    _devicesTypesNb_toreg++;
+
+//  if (_devicesTypesNb + 1 >= _maxDevicesTypesNb) {
+    if (_devicesTypesNb + 1 >  _maxDevicesTypesNb) {
         return;
     }
 
@@ -202,6 +206,8 @@ bool HAMqtt::publish(const char* topic, const char* payload, bool retained)
     ARDUINOHA_DEBUG_PRINT(topic)
     ARDUINOHA_DEBUG_PRINT(F(", len: "))
     ARDUINOHA_DEBUG_PRINTLN(strlen(payload))
+
+  Serial.printf("1 do %s\n",__FUNCTION__ );
 
     _mqtt->beginPublish(topic, strlen(payload), retained);
     _mqtt->write((const uint8_t*)(payload), strlen(payload));

@@ -310,13 +310,24 @@ public:
      */
     void processMessage(const char* topic, const uint8_t* payload, uint16_t length);
 
-#ifdef ARDUINOHA_TEST
+//#ifdef ARDUINOHA_TEST
     inline uint8_t getDevicesTypesNb() const
         { return _devicesTypesNb; }
 
+    inline uint8_t getDevicesTypesNb_toreg() const
+        { return _devicesTypesNb_toreg; }
+
     inline HABaseDeviceType** getDevicesTypes() const
         { return _devicesTypes; }
+//#endif
+
+#ifdef ARDUINOHA_TEST
+    PubSubClientMock* _mqtt;
+#else
+    /// Instance of the PubSubClient class. It's initialized in the constructor.
+    PubSubClient* _mqtt;
 #endif
+
 
 private:
     /// Interval between MQTT reconnects (milliseconds).
@@ -336,12 +347,6 @@ private:
      */
     void onConnectedLogic();
 
-#ifdef ARDUINOHA_TEST
-    PubSubClientMock* _mqtt;
-#else
-    /// Instance of the PubSubClient class. It's initialized in the constructor.
-    PubSubClient* _mqtt;
-#endif
 
     /// Instance of the HADevice passed to the constructor.
     const HADevice& _device;
@@ -372,6 +377,8 @@ private:
 
     /// The amount of registered devices types.
     uint8_t _devicesTypesNb;
+    /// The amount of devices types to register
+    uint8_t _devicesTypesNb_toreg;
 
     /// The maximum amount of devices types that can be registered.
     uint8_t _maxDevicesTypesNb;
