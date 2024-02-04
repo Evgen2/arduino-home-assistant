@@ -82,6 +82,7 @@ public:
      * @note The unique ID can be set only once (via constructor or using this method).
      */
     bool setUniqueId(const byte* uniqueId, const uint16_t length);
+    bool setUniqueIdStr(char* pstr);
 
     /**
      * Sets the "manufacturer" property that's going to be displayed in the Home Assistant.
