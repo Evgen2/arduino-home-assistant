@@ -3,7 +3,7 @@
 
 #include "HABaseDeviceType.h"
 
-#ifndef EX_ARDUINOHA_BUTTON
+#ifndef EX_ARDUINOHA_TEXT
 
 #define HAText_CALLBACK(name) void (*name)(HAText* sender)
 
