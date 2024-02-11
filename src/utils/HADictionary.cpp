@@ -18,6 +18,7 @@ const char HAComponentScene[] PROGMEM = {"scene"};
 const char HAComponentFan[] PROGMEM = {"fan"};
 const char HAComponentLight[] PROGMEM = {"light"};
 const char HAComponentClimate[] PROGMEM = {"climate"};
+const char HAComponentText[] PROGMEM = {"text"};
 
 // decorators
 const char HASerializerSlash[] PROGMEM = {"/"};
