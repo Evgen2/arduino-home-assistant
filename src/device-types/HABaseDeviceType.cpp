@@ -19,6 +19,42 @@ HABaseDeviceType::HABaseDeviceType(
     }
 }
 
+bool HABaseDeviceType::setUniqueIdStr(char* pstr)
+{
+    if (_uniqueId) {
+        return false; // unique ID cannot be changed at runtime once it's set
+    }
+
+
+    char* dst = strdup(pstr); // include null terminator
+
+    _uniqueId = dst;
+
+    return true;
+}
+
+
+bool HABaseDeviceType::setNameUniqueIdStr(char* unic_prefix, const char* name, const char *uid)
+
+{  char str[80], *dst;
+
+    if (_uniqueId) {
+        return false; // unique ID cannot be changed at runtime once it's set
+    }
+
+   strcpy(str,unic_prefix);	
+   strcat(str,"_");	
+   strcat(str,uid);	
+
+   dst = strdup(str); // include null terminator
+
+   _uniqueId = dst;
+    _name = strdup(name);
+
+    return true;
+}
+
+
 void HABaseDeviceType::setAvailability(bool online)
 {
     _availability = (online ? AvailabilityOnline : AvailabilityOffline);

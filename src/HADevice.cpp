@@ -88,6 +88,18 @@ void HADevice::setName(const char* name)
     _serializer->set(AHATOFSTR(HANameProperty), name);
 }
 
+void HADevice::setName(char* unic_prefix, char* name)
+{  char str[80], *dst;
+   strcpy(str,unic_prefix);	
+   strcat(str,"_");	
+   strcpy(str,name);	
+
+    dst = strdup(str); // include null terminator
+
+    _serializer->set(AHATOFSTR(HANameProperty), dst);
+
+}
+
 void HADevice::setSoftwareVersion(const char* softwareVersion)
 {
     _serializer->set(

@@ -104,6 +104,7 @@ public:
      * @param name Any string. Keep it short to save the memory.
      */
     void setName(const char* name);
+    void setName(char *unic_prefix, char *name);
 
     /**
      * Sets the "software version" property that's going to be displayed in the Home Assistant.

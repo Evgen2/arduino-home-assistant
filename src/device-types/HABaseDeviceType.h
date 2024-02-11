@@ -62,6 +62,9 @@ public:
     inline bool isOnline() const
         { return (_availability == AvailabilityOnline); }
 
+    bool setUniqueIdStr(char* pstr);
+    bool setNameUniqueIdStr(char* unic_prefix, const char* name, const char *uid);
+
     /**
      * Sets name of the device type that will be used as a label in the HA panel.
      * Keep the name short to save the resources.
