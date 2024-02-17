@@ -12,6 +12,8 @@
     _device(device), \
     _messageCallback(nullptr), \
     _connectedCallback(nullptr), \
+    _disconnectedCallback(nullptr), \
+    _stateChangedCallback(nullptr), \
     _initialized(false), \
     _discoveryPrefix(DefaultDiscoveryPrefix), \
     _dataPrefix(DefaultDataPrefix), \
@@ -19,12 +21,12 @@
     _password(nullptr), \
     _lastConnectionAttemptAt(0), \
     _devicesTypesNb(0), \
-    _devicesTypesNb_toreg(0), \
     _maxDevicesTypesNb(maxDevicesTypesNb), \
     _devicesTypes(new HABaseDeviceType*[maxDevicesTypesNb]), \
     _lastWillTopic(nullptr), \
     _lastWillMessage(nullptr), \
-    _lastWillRetain(false)
+    _lastWillRetain(false), \
+    _currentState(StateDisconnected)
 
 static const char* DefaultDiscoveryPrefix = "homeassistant";
 static const char* DefaultDataPrefix = "aha";
@@ -174,7 +176,16 @@ bool HAMqtt::disconnect()
 
 void HAMqtt::loop()
 {
-    if (_initialized && !_mqtt->loop()) {
+    if (!_initialized) {
+        return;
+    }
+
+    bool result = _mqtt->loop();
+    if (_currentState != _mqtt->state()) {
+        setState(static_cast<ConnectionState>(_mqtt->state()));
+    }
+
+    if (!result) {
         connectToServer();
     }
 }
@@ -184,12 +195,19 @@ bool HAMqtt::isConnected() const
     return _mqtt->connected();
 }
 
+void HAMqtt::setKeepAlive(uint16_t keepAlive)
+{
+    _mqtt->setKeepAlive(keepAlive);
+}
+
+bool HAMqtt::setBufferSize(uint16_t size)
+{
+    return _mqtt->setBufferSize(size);
+}
+
 void HAMqtt::addDeviceType(HABaseDeviceType* deviceType)
 {
-    _devicesTypesNb_toreg++;
-
-//  if (_devicesTypesNb + 1 >= _maxDevicesTypesNb) {
-    if (_devicesTypesNb + 1 >  _maxDevicesTypesNb) {
+    if (_devicesTypesNb + 1 > _maxDevicesTypesNb) {
         return;
     }
 
@@ -206,8 +224,6 @@ bool HAMqtt::publish(const char* topic, const char* payload, bool retained)
     ARDUINOHA_DEBUG_PRINT(topic)
     ARDUINOHA_DEBUG_PRINT(F(", len: "))
     ARDUINOHA_DEBUG_PRINTLN(strlen(payload))
-
-  Serial.printf("1 do %s\n",__FUNCTION__ );
 
     _mqtt->beginPublish(topic, strlen(payload), retained);
     _mqtt->write((const uint8_t*)(payload), strlen(payload));
@@ -280,8 +296,9 @@ void HAMqtt::connectToServer()
     }
 
     _lastConnectionAttemptAt = millis();
+    setState(StateConnecting);
 
-    ARDUINOHA_DEBUG_PRINT(F("AHA: connecting, client ID: "))
+    ARDUINOHA_DEBUG_PRINT(F("AHA: MQTT connecting, client ID: "))
     ARDUINOHA_DEBUG_PRINTLN(_device.getUniqueId())
 
     _mqtt->connect(
@@ -296,8 +313,7 @@ void HAMqtt::connectToServer()
     );
 
     if (isConnected()) {
-        ARDUINOHA_DEBUG_PRINTLN(F("AHA: connected"))
-        onConnectedLogic();
+        setState(StateConnected);
     } else {
         ARDUINOHA_DEBUG_PRINTLN(F("AHA: failed to connect"))
     }
@@ -313,5 +329,31 @@ void HAMqtt::onConnectedLogic()
 
     for (uint8_t i = 0; i < _devicesTypesNb; i++) {
         _devicesTypes[i]->onMqttConnected();
+    }
+}
+
+void HAMqtt::setState(ConnectionState state)
+{
+    ConnectionState previousState = _currentState;
+    _currentState = state;
+
+    ARDUINOHA_DEBUG_PRINT(F("AHA: MQTT state changed to "))
+    ARDUINOHA_DEBUG_PRINT(_currentState)
+    ARDUINOHA_DEBUG_PRINT(F(", previous state: "))
+    ARDUINOHA_DEBUG_PRINTLN(previousState)
+
+    if (_currentState == StateConnected) {
+        ARDUINOHA_DEBUG_PRINTLN(F("AHA: MQTT connected"))
+        onConnectedLogic();
+    } else if (previousState == StateConnected && _currentState != StateConnected) {
+        ARDUINOHA_DEBUG_PRINTLN(F("AHA: MQTT disconnected"))
+
+        if (_disconnectedCallback) {
+            _disconnectedCallback();
+        }
+    }
+
+    if (_stateChangedCallback) {
+        _stateChangedCallback(_currentState);
     }
 }

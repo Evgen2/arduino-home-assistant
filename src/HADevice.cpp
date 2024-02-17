@@ -6,10 +6,11 @@
 
 #define HADEVICE_INIT \
     _ownsUniqueId(false), \
-    _serializer(new HASerializer(nullptr, 5)), \
+    _serializer(new HASerializer(nullptr, 6)), \
     _availabilityTopic(nullptr), \
     _sharedAvailability(false), \
-    _available(true) // device will be available by default
+    _available(true), \
+    _extendedUniqueIds(false)
 
 HADevice::HADevice() :
     _uniqueId(nullptr),
@@ -108,6 +109,14 @@ void HADevice::setSoftwareVersion(const char* softwareVersion)
     );
 }
 
+void HADevice::setConfigurationUrl(const char* url)
+{
+    _serializer->set(
+        AHATOFSTR(HADeviceConfigurationUrlProperty),
+        url
+    );
+}
+
 void HADevice::setAvailability(bool online)
 {
     _available = online;
@@ -165,7 +174,6 @@ void HADevice::publishAvailability() const
 
     const char* payload = _available ? HAOnline : HAOffline;
     const uint16_t length = strlen_P(payload);
-
 
     if (mqtt->beginPublish(_availabilityTopic, length, true)) {
         mqtt->writePayload(AHATOFSTR(payload));

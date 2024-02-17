@@ -37,10 +37,13 @@ extern const char HADeviceIdentifiersProperty[];
 extern const char HADeviceManufacturerProperty[];
 extern const char HADeviceModelProperty[];
 extern const char HADeviceSoftwareVersionProperty[];
+extern const char HADeviceConfigurationUrlProperty[];
 extern const char HANameProperty[];
 extern const char HAUniqueIdProperty[];
+extern const char HAObjectIdProperty[];
 extern const char HADeviceProperty[];
 extern const char HADeviceClassProperty[];
+extern const char HAStateClassProperty[];
 extern const char HAIconProperty[];
 extern const char HARetainProperty[];
 extern const char HASourceTypeProperty[];
@@ -72,6 +75,7 @@ extern const char HASwingModesProperty[];
 extern const char HAModesProperty[];
 extern const char HATemperatureCommandTemplateProperty[];
 extern const char HAPayloadOnProperty[];
+extern const char HAExpireAfterProperty[];
 
 // topics
 extern const char HAConfigTopic[];
@@ -101,6 +105,7 @@ extern const char HATemperatureCommandTopic[];
 extern const char HATemperatureStateTopic[];
 extern const char HARGBCommandTopic[];
 extern const char HARGBStateTopic[];
+extern const char HAJsonAttributesTopic[];
 
 // misc
 extern const char HAOnline[];
