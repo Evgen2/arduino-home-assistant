@@ -48,7 +48,7 @@ but I successfully use it on ESP8266/ESP8255 boards in my projects.
 | Switch              |     ✅     |
 | Update              |     ❌     |
 | Tag scanner         |     ✅     |
-| Text                |     ✅     |⚡
+| Text                |     ✅ ⚡   |
 | Vacuum              |     ❌     |
 | Valve               |     ❌     |
 | Water heater        |     ❌     |
