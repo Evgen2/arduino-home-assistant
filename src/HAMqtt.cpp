@@ -21,6 +21,7 @@
     _password(nullptr), \
     _lastConnectionAttemptAt(0), \
     _devicesTypesNb(0), \
+    _devicesTypesNb_toreg(0), \
     _maxDevicesTypesNb(maxDevicesTypesNb), \
     _devicesTypes(new HABaseDeviceType*[maxDevicesTypesNb]), \
     _lastWillTopic(nullptr), \
@@ -207,6 +208,9 @@ bool HAMqtt::setBufferSize(uint16_t size)
 
 void HAMqtt::addDeviceType(HABaseDeviceType* deviceType)
 {
+
+    _devicesTypesNb_toreg++;
+
     if (_devicesTypesNb + 1 > _maxDevicesTypesNb) {
         return;
     }
