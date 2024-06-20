@@ -13,24 +13,16 @@
  *
  * @note
  * You can find more information about this entity in the Home Assistant documentation:
- * https://www.home-assistant.io/integrations/button.mqtt/
+ * https://www.home-assistant.io/integrations/text.mqtt/
  */
 class HAText : public HABaseDeviceType
 {
 public:
     /**
-     * @param uniqueId The unique ID of the button. It needs to be unique in a scope of your device.
+     * @param uniqueId The unique ID. It needs to be unique in a scope of your device.
      */
     HAText(const char* uniqueId);
 
-    /**
-     * Sets class of the device.
-     * You can find list of available values here: https://www.home-assistant.io/integrations/button/#device-class
-     *
-     * @param deviceClass The class name.
-     */
-    inline void setDeviceClass(const char* deviceClass)
-        { _class = deviceClass; }
 
     /**
      * Forces HA panel to process each incoming value (MQTT message).
@@ -52,13 +44,26 @@ public:
 
     bool setValue(const char* value);
 
+    /* Registers callback that will be called each time the number is changed in the HA panel.
+     * Please note that it's not possible to register multiple callbacks for the same number.
+     *
+     * @param callback
+     * @note In non-optimistic mode, the number must be reported back to HA using the HANumber::setState method.
+     */
+    inline void onCommand(HAText_CALLBACK(callback))
+        { _commandCallback = callback; }
+
+
+
 protected:
     virtual void buildSerializer() override;
     virtual void onMqttConnected() override;
 
 private:
-    /// The device class. It can be nullptr.
-    const char* _class;
+
+    void handleCommand(const uint8_t* cmd, const uint16_t length);
+
+    HAText_CALLBACK(_commandCallback);
 
     /// The force update flag for the HA panel.
     bool _forceUpdate;

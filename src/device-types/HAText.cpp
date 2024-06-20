@@ -6,7 +6,6 @@
 
 HAText::HAText(const char* uniqueId) :
     HABaseDeviceType(AHATOFSTR(HAComponentText), uniqueId),
-    _class(nullptr),
     _icon(nullptr)
 {
 
@@ -22,7 +21,6 @@ void HAText::buildSerializer()
     _serializer->set(AHATOFSTR(HANameProperty), _name);
     _serializer->set(AHATOFSTR(HAObjectIdProperty), _objectId);
     _serializer->set(HASerializer::WithUniqueId);
-    _serializer->set(AHATOFSTR(HADeviceClassProperty), _class);
     _serializer->set(AHATOFSTR(HAIconProperty), _icon);
 
     // optional property
@@ -47,7 +45,6 @@ void HAText::onMqttConnected()
         return;
     }
 
-   Serial.printf("$$$$$$$$$$$$$$$$ onMqttConnected\n");
 
     publishConfig();
     publishAvailability();
