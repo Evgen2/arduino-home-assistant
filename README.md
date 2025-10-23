@@ -1,4 +1,6 @@
 # Arduino Home Assistant integration 🏠
+## 2.1.0.a
+
 
 [![](https://img.shields.io/github/v/release/dawidchyrzynski/arduino-home-assistant?label=Version)](https://github.com/dawidchyrzynski/arduino-home-assistant/releases)
 [![](https://img.shields.io/badge/Browse_Documentation-40BC13)](https://dawidchyrzynski.github.io/arduino-home-assistant/)
