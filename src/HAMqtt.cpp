@@ -9,6 +9,8 @@
 #include "mocks/PubSubClientMock.h"
 
 #define HAMQTT_INIT \
+    max_time_use(0), \
+    callback_at_maxtime(nullptr), \
     _device(device), \
     _messageCallback(nullptr), \
     _connectedCallback(nullptr), \
@@ -28,6 +30,7 @@
     _lastWillMessage(nullptr), \
     _lastWillRetain(false), \
     _currentState(StateDisconnected)
+
 
 static const char* DefaultDiscoveryPrefix = "homeassistant";
 static const char* DefaultDataPrefix = "aha";
@@ -176,7 +179,7 @@ bool HAMqtt::disconnect()
 }
 
 void HAMqtt::loop()
-{
+{  
     if (!_initialized) {
         return;
     }
@@ -294,7 +297,7 @@ void HAMqtt::processMessage(const char* topic, const uint8_t* payload, uint16_t 
 
 void HAMqtt::connectToServer()
 {
-    if (_lastConnectionAttemptAt > 0 &&
+   if (_lastConnectionAttemptAt > 0 &&
             (millis() - _lastConnectionAttemptAt) < ReconnectInterval) {
         return;
     }
@@ -325,6 +328,10 @@ void HAMqtt::connectToServer()
 
 void HAMqtt::onConnectedLogic()
 {
+    unsigned long _t0, _dt1;
+    _t0 = millis(); 
+
+    ARDUINOHA_DEBUG_PRINTLN(F("AHA: onConnectedLogic"))
     if (_connectedCallback) {
         _connectedCallback();
     }
@@ -332,6 +339,13 @@ void HAMqtt::onConnectedLogic()
     _device.publishAvailability();
 
     for (uint8_t i = 0; i < _devicesTypesNb; i++) {
+        _dt1 = millis() - _t0;
+        if(_dt1 > max_time_use) // prevent long time spending
+        {   if(callback_at_maxtime)
+            {   callback_at_maxtime();
+                _t0 = millis();
+            }
+        }
         _devicesTypes[i]->onMqttConnected();
     }
 }
