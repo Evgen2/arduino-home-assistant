@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0.a
+## 2.1.1
 * prevent long time spending at onConnectedLogic() without callback function call
 
 ## 2.1.0
