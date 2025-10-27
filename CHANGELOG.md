@@ -2,6 +2,7 @@
 
 ## 2.1.1
 * prevent long time spending at onConnectedLogic() without callback function call
+* set ReconnectInterval not constant
 
 ## 2.1.0
 

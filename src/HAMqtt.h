@@ -389,10 +389,10 @@ public:
 
     int max_time_use; // max time in ms onConnectedLogic until callback_at_maxtime() is called;  prevent long time spending 
     void  (* callback_at_maxtime)(void);
+    /// Interval between MQTT reconnects (milliseconds).
+    uint16_t ReconnectInterval;
 
 private:
-    /// Interval between MQTT reconnects (milliseconds).
-    static const uint16_t ReconnectInterval = 10000;
 
     /// Living instance of the HAMqtt class. It can be nullptr.
     static HAMqtt* _instance;

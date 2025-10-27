@@ -11,6 +11,7 @@
 #define HAMQTT_INIT \
     max_time_use(0), \
     callback_at_maxtime(nullptr), \
+    ReconnectInterval(10000), \
     _device(device), \
     _messageCallback(nullptr), \
     _connectedCallback(nullptr), \
