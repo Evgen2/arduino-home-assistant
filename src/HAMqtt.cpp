@@ -187,6 +187,9 @@ void HAMqtt::loop()
 
     bool result = _mqtt->loop();
     if (_currentState != _mqtt->state()) {
+#if defined(ARDUINOHA_DEBUG)
+        Serial.printf("HAMqtt::loop _currentState %d _mqtt->state %d\n", _currentState, _mqtt->state());
+#endif        
         setState(static_cast<ConnectionState>(_mqtt->state()));
     }
 
@@ -303,6 +306,10 @@ void HAMqtt::connectToServer()
         return;
     }
 
+#if defined(ARDUINOHA_DEBUG)
+    Serial.printf("HAMqtt::connectToServer millis() %ld_lastConnectionAttemptAt %ld _mqtt->state() %d\n", 
+        millis(), _lastConnectionAttemptAt,  _mqtt->state());
+#endif
     _lastConnectionAttemptAt = millis();
     setState(StateConnecting);
 
@@ -320,6 +327,9 @@ void HAMqtt::connectToServer()
         true
     );
 
+#if defined(ARDUINOHA_DEBUG)
+    Serial.printf("HAMqtt::connectToServer millis() %ld , _mqtt->state()  %d\n", millis(), _mqtt->state());
+#endif    
     if (isConnected()) {
         setState(StateConnected);
     } else {
@@ -349,6 +359,10 @@ void HAMqtt::onConnectedLogic()
         }
         _devicesTypes[i]->onMqttConnected();
     }
+}
+
+int  HAMqtt::getState(void)
+{   return _currentState;
 }
 
 void HAMqtt::setState(ConnectionState state)

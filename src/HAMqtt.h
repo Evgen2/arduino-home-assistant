@@ -391,6 +391,8 @@ public:
     void  (* callback_at_maxtime)(void);
     /// Interval between MQTT reconnects (milliseconds).
     uint16_t ReconnectInterval;
+///Get the state of the MQTT connection.
+    int  getState(void); 
 
 private:
 
@@ -445,7 +447,7 @@ private:
     const char* _password;
 
     /// Time of the last connection attemps (milliseconds since boot).
-    uint32_t _lastConnectionAttemptAt;
+    unsigned long _lastConnectionAttemptAt;
 
     /// The amount of registered devices types.
     uint8_t _devicesTypesNb;
