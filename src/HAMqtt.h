@@ -387,8 +387,9 @@ public:
     PubSubClient* _mqtt;
 #endif
 
-    int max_time_use; // max time in ms onConnectedLogic until callback_at_maxtime() is called;  prevent long time spending 
-    void  (* callback_at_maxtime)(void);
+    void  (* callback_loop)(int src); //  callback for long time spending in mqqt
+    void  set_callback_loop( void (* _callback_loop)(int src)); 
+
     /// Interval between MQTT reconnects (milliseconds).
     uint16_t ReconnectInterval;
 ///Get the state of the MQTT connection.

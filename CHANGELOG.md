@@ -1,4 +1,22 @@
 # Changelog
+## 2.1.2
+* prevent long time spending as well in PubSubClient _mqtt
+  set_callback_loop() set pointer to callback_loop for use in HAMqtt and _mqtt
+  callback_loop should be pointer to function like that
+   ```c
+void loop_callback(int src)
+{ static unsigned long int t0 = 0;
+  const unsigned int max_time_use = 300;
+  dt = t - t0;
+  if(millis() - t0 > max_time_use)
+  {
+    Watchdogsreset();
+    //other stuff
+    t0  = millis();
+  }
+}
+
+   ```
 
 ## 2.1.1
 * prevent long time spending at onConnectedLogic() without callback function call

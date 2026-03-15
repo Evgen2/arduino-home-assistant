@@ -25,7 +25,7 @@
     #include <Arduino.h>
 
     #define ARDUINOHA_DEBUG_INIT() Serial.begin(115200);
-    #define ARDUINOHA_DEBUG_PRINTLN(x) Serial.println(x);
+    #define ARDUINOHA_DEBUG_PRINTLN(x) { Serial.print(x); Serial.print("\n"); }
     #define ARDUINOHA_DEBUG_PRINT(x) Serial.print(x);
 #else
     #define ARDUINOHA_DEBUG_INIT()

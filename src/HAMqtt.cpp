@@ -9,8 +9,7 @@
 #include "mocks/PubSubClientMock.h"
 
 #define HAMQTT_INIT \
-    max_time_use(0), \
-    callback_at_maxtime(nullptr), \
+    callback_loop(nullptr), \
     ReconnectInterval(10000), \
     _device(device), \
     _messageCallback(nullptr), \
@@ -307,8 +306,8 @@ void HAMqtt::connectToServer()
     }
 
 #if defined(ARDUINOHA_DEBUG)
-    Serial.printf("HAMqtt::connectToServer millis() %ld_lastConnectionAttemptAt %ld _mqtt->state() %d\n", 
-        millis(), _lastConnectionAttemptAt,  _mqtt->state());
+    Serial.printf("HAMqtt::connectToServer: millis() %ld - _lastConnectAt %ld > ReconnInterval %d _mqtt->state() %d\n", 
+        millis(), _lastConnectionAttemptAt, ReconnectInterval, _mqtt->state());
 #endif
     _lastConnectionAttemptAt = millis();
     setState(StateConnecting);
@@ -339,9 +338,6 @@ void HAMqtt::connectToServer()
 
 void HAMqtt::onConnectedLogic()
 {
-    unsigned long _t0, _dt1;
-    _t0 = millis(); 
-
     ARDUINOHA_DEBUG_PRINTLN(F("AHA: onConnectedLogic"))
     if (_connectedCallback) {
         _connectedCallback();
@@ -350,13 +346,8 @@ void HAMqtt::onConnectedLogic()
     _device.publishAvailability();
 
     for (uint8_t i = 0; i < _devicesTypesNb; i++) {
-        _dt1 = millis() - _t0;
-        if(_dt1 > max_time_use) // prevent long time spending
-        {   if(callback_at_maxtime)
-            {   callback_at_maxtime();
-                _t0 = millis();
-            }
-        }
+        if(callback_loop)
+            callback_loop(1);
         _devicesTypes[i]->onMqttConnected();
     }
 }
@@ -389,4 +380,10 @@ void HAMqtt::setState(ConnectionState state)
     if (_stateChangedCallback) {
         _stateChangedCallback(_currentState);
     }
+}
+
+void  HAMqtt::set_callback_loop( void (* _callback_loop)(int src))
+{   callback_loop = _callback_loop;
+    if(_mqtt)
+        _mqtt->callback_loop = _callback_loop;
 }
