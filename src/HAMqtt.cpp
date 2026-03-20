@@ -21,7 +21,7 @@
     _dataPrefix(DefaultDataPrefix), \
     _username(nullptr), \
     _password(nullptr), \
-    _lastConnectionAttemptAt(0), \
+    _lastConnectionActivity(0), \
     _devicesTypesNb(0), \
     _devicesTypesNb_toreg(0), \
     _maxDevicesTypesNb(maxDevicesTypesNb), \
@@ -172,7 +172,7 @@ bool HAMqtt::disconnect()
     ARDUINOHA_DEBUG_PRINTLN(F("AHA: disconnecting"))
 
     _initialized = false;
-    _lastConnectionAttemptAt = 0;
+    _lastConnectionActivity = 0;
     _mqtt->disconnect();
 
     return true;
@@ -185,11 +185,19 @@ void HAMqtt::loop()
     }
 
     bool result = _mqtt->loop();
-    if (_currentState != _mqtt->state()) {
+    int _newstate = _mqtt->state();
+    if (_currentState != _newstate) {
 #if defined(ARDUINOHA_DEBUG)
-        Serial.printf("HAMqtt::loop _currentState %d _mqtt->state %d\n", _currentState, _mqtt->state());
+        Serial.printf("HAMqtt::loop _currentState %d _mqtt->state %d\n", _currentState, _newstate);        
 #endif        
-        setState(static_cast<ConnectionState>(_mqtt->state()));
+        if(_currentState == StateConnected)
+        {  
+            _lastConnectionActivity = millis();
+#if defined(ARDUINOHA_DEBUG)
+            Serial.printf("HAMqtt::loop _set _lastConnectionActivity to  %ld\n", _lastConnectionActivity);        
+#endif        
+        }
+        setState(static_cast<ConnectionState>(_newstate));
     }
 
     if (!result) {
@@ -246,11 +254,12 @@ bool HAMqtt::beginPublish(
     bool retained
 )
 {
+#if ARDUINOHA_DEBUG_LEV > 3
     ARDUINOHA_DEBUG_PRINT(F("AHA: begin publish "))
     ARDUINOHA_DEBUG_PRINT(topic)
     ARDUINOHA_DEBUG_PRINT(F(", len: "))
     ARDUINOHA_DEBUG_PRINTLN(payloadLength)
-
+#endif
     return _mqtt->beginPublish(topic, payloadLength, retained);
 }
 
@@ -300,16 +309,16 @@ void HAMqtt::processMessage(const char* topic, const uint8_t* payload, uint16_t 
 
 void HAMqtt::connectToServer()
 {
-   if (_lastConnectionAttemptAt > 0 &&
-            (millis() - _lastConnectionAttemptAt) < ReconnectInterval) {
+   if (_lastConnectionActivity > 0 &&
+            (millis() - _lastConnectionActivity) < ReconnectInterval) {
         return;
     }
 
 #if defined(ARDUINOHA_DEBUG)
-    Serial.printf("HAMqtt::connectToServer: millis() %ld - _lastConnectAt %ld > ReconnInterval %d _mqtt->state() %d\n", 
-        millis(), _lastConnectionAttemptAt, ReconnectInterval, _mqtt->state());
+    Serial.printf("HAMqtt::connectToServer: millis() %ld - _lastConnectAct %ld > ReconnInterval %d _mqtt->state() %d\n", 
+        millis(), _lastConnectionActivity, ReconnectInterval, _mqtt->state());
 #endif
-    _lastConnectionAttemptAt = millis();
+    _lastConnectionActivity = millis();
     setState(StateConnecting);
 
     ARDUINOHA_DEBUG_PRINT(F("AHA: MQTT connecting, client ID: "))
@@ -327,7 +336,8 @@ void HAMqtt::connectToServer()
     );
 
 #if defined(ARDUINOHA_DEBUG)
-    Serial.printf("HAMqtt::connectToServer millis() %ld , _mqtt->state()  %d\n", millis(), _mqtt->state());
+    Serial.printf("HAMqtt::connectToServer dt %ld , _mqtt->state()  %d\n",
+		millis() - _lastConnectionActivity, _mqtt->state());
 #endif    
     if (isConnected()) {
         setState(StateConnected);

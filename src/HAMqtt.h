@@ -447,8 +447,8 @@ private:
     /// The password used for the authentication. It's set in the HAMqtt::begin method.
     const char* _password;
 
-    /// Time of the last connection attemps (milliseconds since boot).
-    unsigned long _lastConnectionAttemptAt;
+    /// Time of the last connection activity (milliseconds since boot).
+    unsigned long _lastConnectionActivity;
 
     /// The amount of registered devices types.
     uint8_t _devicesTypesNb;
