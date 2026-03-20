@@ -1,4 +1,7 @@
 # Changelog
+## 2.1.3
+* reconnect interval clarification
+
 ## 2.1.2
 * prevent long time spending as well in PubSubClient _mqtt
   set_callback_loop() set pointer to callback_loop for use in HAMqtt and _mqtt
